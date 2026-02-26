@@ -1,11 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { auth, googleProvider } from "../firebase";
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  type User,
-} from "firebase/auth";
+import { supabase } from "../supabaseClient";
+import { type User } from "@supabase/supabase-js";
 import type { Movie } from "../types/movie";
 
 interface MovieContextType {
@@ -37,15 +32,27 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
   const [pickedFilm, setPickedFilm] = useState<Movie | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
     });
-    return () => unsubscribe();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Ошибка входа: ", error);
     }
@@ -53,12 +60,12 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (error) {
       console.error("Ошибка выхода: ", error);
     }
   };
-
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
   };

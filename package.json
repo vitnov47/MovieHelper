@@ -12,9 +12,9 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@reduxjs/toolkit": "^2.11.2",
+    "@supabase/supabase-js": "^2.97.0",
     "antd": "^6.2.2",
     "antd-style": "^4.1.0",
-    "firebase": "^12.8.0",
     "framer-motion": "^12.29.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
