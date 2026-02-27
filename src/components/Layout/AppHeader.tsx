@@ -6,7 +6,7 @@ import HeaderButtons from "../HeaderButtons";
 import useMovieContext from "../../context/movie-context";
 
 const AppHeader = () => {
-  const { handleSearch } = useMovieContext();
+  const { handleSearch, contextHolder } = useMovieContext();
 
   const scrollTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -30,8 +30,8 @@ const AppHeader = () => {
         zIndex: "1",
       }}
     >
+      {contextHolder}
       <Button
-        ghost
         type="link"
         style={{ display: "flex", alignItems: "center", gap: "10px" }}
         onClick={scrollTop}

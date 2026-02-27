@@ -3,7 +3,13 @@ import useMovieContext from "../context/movie-context";
 
 const { Text } = Typography;
 const ModalFilm = () => {
-  const { openModal, pickedFilm: film, closeModal } = useMovieContext();
+  const {
+    openModal,
+    pickedFilm: film,
+    closeModal,
+    toggleFavorite,
+    isFavorite,
+  } = useMovieContext();
 
   return (
     <Modal
@@ -14,11 +20,13 @@ const ModalFilm = () => {
         <Flex justify="space-between">
           <Button
             key="back"
-            type="primary"
-            onClick={closeModal}
+            type={isFavorite ? "default" : "primary"}
+            onClick={() => {
+              if (film) toggleFavorite(film);
+            }}
             style={{ width: "49%" }}
           >
-            В избранное
+            {isFavorite ? "Удалить из избранного" : "В избранное"}
           </Button>
           <Button
             key="ok"
