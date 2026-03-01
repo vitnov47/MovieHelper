@@ -86,6 +86,8 @@ const AppContent = () => {
 
         {isError && <h1>Ошибка загрузки</h1>}
 
+
+
         {isDarkMode ? (
           <hr color="#7a7a7a" style={{ marginBottom: 20 }} />
         ) : (
@@ -93,6 +95,11 @@ const AppContent = () => {
         )}
         <FilmSection title="Фильмы" films={movies} isLoading={isLoading} />
         {isLoading && <LoadingSection />}
+        {!isLoading && movies.length === 0 && (
+          <h3 style={{ color: "white", textAlign: "center" }}>
+            Фильмы не найдены
+          </h3>
+        )}
 
         {isDarkMode ? (
           <hr color="#7a7a7a" style={{ marginBottom: 20 }} />
@@ -101,12 +108,12 @@ const AppContent = () => {
         )}
         <FilmSection title="Сериалы" films={series} isLoading={isLoading} />
         {isLoading && <LoadingSection />}
-
-        {!isLoading && movies.length === 0 && series.length === 0 && (
+        {!isLoading && series.length === 0 && (
           <h3 style={{ color: "white", textAlign: "center" }}>
-            Ничего не найдено
+            Сериалы не найдены
           </h3>
         )}
+
       </div>
       <ModalFilm />
     </Layout.Content>

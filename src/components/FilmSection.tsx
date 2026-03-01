@@ -37,10 +37,11 @@ const cardScrollVariants: Variants = {
 
 const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const screens = useBreakpoint();
+  
   if (!isLoading && (!films || films.length === 0)) {
     return null;
   }
-  const screens = useBreakpoint();
 
   const getSlidesToShow = () => {
     if (screens.xxl) return 6;
