@@ -69,7 +69,7 @@ const AppContent = () => {
   return (
     <Layout.Content
       style={{
-        padding: "24px",
+        padding: "20px",
         paddingTop: "64px",
         backgroundImage: isDarkMode ? darkGradient : neonGradient,
       }}

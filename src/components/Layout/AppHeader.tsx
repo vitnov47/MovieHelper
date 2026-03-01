@@ -33,13 +33,13 @@ const AppHeader = () => {
       {contextHolder}
       <Button
         type="link"
-        style={{ display: "flex", alignItems: "center", gap: "10px" }}
+        style={{ display: "flex", alignItems: "center", padding: 0, paddingRight: '10px' }}
         onClick={scrollTop}
       >
         <img
           src={logo}
           alt="MovieHelper"
-          style={{ height: "50px", objectFit: "contain" }}
+          style={{ height: "120%", objectFit: "contain" }}
         />
       </Button>
 

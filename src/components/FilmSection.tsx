@@ -52,13 +52,15 @@ const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
     return 6;
   };
 
+  const isArrows = () => screens.xxl || screens.xl || screens.lg;
+
   const carouselSettings = {
     dots: false,
     infinite: false,
     speed: 500,
     slidesToShow: getSlidesToShow(),
     slidesToScroll: Math.ceil(getSlidesToShow() / 2),
-    arrows: true,
+    arrows: isArrows(),
   };
 
   return (
