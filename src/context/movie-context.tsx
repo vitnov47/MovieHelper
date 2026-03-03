@@ -72,6 +72,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
       console.error("Ошибка выхода: ", error);
     }
   };
+  
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
   };

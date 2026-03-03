@@ -1,4 +1,4 @@
-import { Space, Button, Dropdown, Tooltip, Grid } from "antd";
+import { Space, Button, Dropdown, Tooltip, Grid, Switch } from "antd";
 import {
   UserOutlined,
   BookOutlined,
@@ -65,17 +65,18 @@ const HeaderButtons = () => {
   return (
     <Space
       size="middle"
+      align="center"
       style={{
         marginLeft: "20px",
       }}
     >
-      <Tooltip title="Сменить тему" placement="bottom" color="#2d0f4f">
-        <Button
-          shape="circle"
-          icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
-          onClick={toggleTheme}
-        />
-      </Tooltip>
+      <Switch 
+        unCheckedChildren={<MoonOutlined />} 
+        checkedChildren={<SunOutlined />} 
+        onChange={toggleTheme}
+        defaultChecked={!isDarkMode}
+      />
+
       {!isLogined ? (
         <Tooltip title="Войти" placement="bottom" color="#2d0f4f">
           <Button
