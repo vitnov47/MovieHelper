@@ -1,6 +1,7 @@
 import { type ChangeEvent } from "react";
-import { Layout, Input, Button } from "antd";
+import { Layout, Input, Button, Grid } from "antd";
 import logo from "../../assets/app_icon.png";
+import mobLogo from "../../assets/app_icon_mob.png";
 import "../../styles/button.css";
 import HeaderButtons from "../HeaderButtons";
 import useMovieContext from "../../context/movie-context";
@@ -16,6 +17,8 @@ const AppHeader = () => {
     if (!value.currentTarget.value.trim()) handleSearch("");
   };
 
+  const screens = Grid.useBreakpoint()
+  
   return (
     <Layout.Header
       style={{
@@ -37,14 +40,14 @@ const AppHeader = () => {
         onClick={scrollTop}
       >
         <img
-          src={logo}
+          src={screens.md ? logo : mobLogo}
           alt="MovieHelper"
           style={{ height: "120%", objectFit: "contain" }}
         />
       </Button>
 
       <Input.Search
-        placeholder="Найти фильм или подборку..."
+        placeholder="Найти..."
         onSearch={handleSearch}
         onChange={(value) => handleChange(value)}
         style={{ width: "55%", maxWidth: "700px" }}
