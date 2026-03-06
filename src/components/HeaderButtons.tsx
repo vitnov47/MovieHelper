@@ -70,11 +70,12 @@ const HeaderButtons = () => {
         marginLeft: "20px",
       }}
     >
-      <Switch 
-        unCheckedChildren={<MoonOutlined />} 
-        checkedChildren={<SunOutlined />} 
+      <Switch
+        unCheckedChildren={<MoonOutlined />}
+        checkedChildren={<SunOutlined />}
         onChange={toggleTheme}
         defaultChecked={!isDarkMode}
+        style={{ backgroundColor: isDarkMode ? "#000" : "#722ed1" }}
       />
 
       {!isLogined ? (

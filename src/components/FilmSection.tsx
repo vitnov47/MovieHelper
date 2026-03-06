@@ -38,7 +38,7 @@ const cardScrollVariants: Variants = {
 const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const screens = useBreakpoint();
-  
+
   if (!isLoading && (!films || films.length === 0)) {
     return null;
   }
@@ -53,7 +53,7 @@ const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
     return 6;
   };
 
-  const isArrows = () => screens.xxl || screens.xl || screens.lg;
+  const isArrows = () => screens.sm;
 
   const carouselSettings = {
     dots: false,
@@ -62,6 +62,8 @@ const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
     slidesToShow: getSlidesToShow(),
     slidesToScroll: Math.ceil(getSlidesToShow() / 2),
     arrows: isArrows(),
+    centerMode: !screens.sm,
+    centerPadding: !screens.sm ? "40px" : "0px",
   };
 
   return (
