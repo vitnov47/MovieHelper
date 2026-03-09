@@ -57,6 +57,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: { redirectTo: window.location.origin },
       });
       if (error) throw error;
     } catch (error) {
@@ -72,7 +73,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
       console.error("Ошибка выхода: ", error);
     }
   };
-  
+
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
   };

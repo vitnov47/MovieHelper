@@ -9,6 +9,7 @@ import {
   LoginOutlined,
 } from "@ant-design/icons";
 import useMovieContext from "../context/movie-context";
+import { useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 
 const { useBreakpoint } = Grid;
@@ -21,6 +22,7 @@ const HeaderButtons = () => {
     handleGoogleLogin,
     handleLogout,
   } = useMovieContext();
+  const navigate = useNavigate();
 
   const items: MenuProps["items"] = [
     {
@@ -89,7 +91,11 @@ const HeaderButtons = () => {
       ) : screens.md ? (
         <>
           <Tooltip title="Избранные" placement="bottom" color="#2d0f4f">
-            <Button shape="circle" icon={<StarOutlined />} />
+            <Button
+              shape="circle"
+              icon={<StarOutlined />}
+              onClick={() => navigate("/favorites")}
+            />
           </Tooltip>
           <Tooltip title="Мои подборки" placement="bottom" color="#2d0f4f">
             <Button shape="circle" icon={<BookOutlined />} />

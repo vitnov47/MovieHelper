@@ -5,20 +5,18 @@ import mobLogo from "../../assets/app_icon_mob.png";
 import "../../styles/button.css";
 import HeaderButtons from "../HeaderButtons";
 import useMovieContext from "../../context/movie-context";
+import { useNavigate } from "react-router-dom";
 
 const AppHeader = () => {
   const { handleSearch, contextHolder } = useMovieContext();
-
-  const scrollTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const navigate = useNavigate();
 
   const handleChange = (value: ChangeEvent<HTMLInputElement>) => {
     if (!value.currentTarget.value.trim()) handleSearch("");
   };
 
-  const screens = Grid.useBreakpoint()
-  
+  const screens = Grid.useBreakpoint();
+
   return (
     <Layout.Header
       style={{
@@ -36,8 +34,15 @@ const AppHeader = () => {
       {contextHolder}
       <Button
         type="link"
-        style={{ display: "flex", alignItems: "center", padding: 0, paddingRight: '10px' }}
-        onClick={scrollTop}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: 0,
+          paddingRight: "10px",
+        }}
+        onClick={() => {
+          navigate("/");
+        }}
       >
         <img
           src={screens.md ? logo : mobLogo}

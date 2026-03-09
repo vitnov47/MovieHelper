@@ -9,7 +9,6 @@ import FilmSection from "../FilmSection";
 import type { Movie } from "../../types/movie";
 import LoadingSection from "../LoadingSection";
 import useMovieContext from "../../context/movie-context";
-import ModalFilm from "../ModalFilm";
 
 const AppContent = () => {
   const { searchTerm, isDarkMode } = useMovieContext();
@@ -86,8 +85,6 @@ const AppContent = () => {
 
         {isError && <h1>Ошибка загрузки</h1>}
 
-
-
         {isDarkMode ? (
           <hr color="#7a7a7a" style={{ marginBottom: 20 }} />
         ) : (
@@ -113,9 +110,7 @@ const AppContent = () => {
             Сериалы не найдены
           </h3>
         )}
-
       </div>
-      <ModalFilm />
     </Layout.Content>
   );
 };
