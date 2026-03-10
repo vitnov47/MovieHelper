@@ -31,7 +31,7 @@ const HeaderButtons = () => {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://www.antgroup.com"
+          onClick={() => navigate("/favorites")}
         >
           Избранное
         </a>
