@@ -2,6 +2,7 @@ import { useSearchMoviesQuery } from "../../api/movieApi";
 import { Layout } from "antd";
 import "../../styles/card.css";
 import useMovieContext from "../../context/movie-context";
+import RecommendationsSection from "../RecommendationsSection";
 import MoviesSection from "../MoviesSection";
 import SeriesSection from "../SeriesSection";
 
@@ -39,6 +40,7 @@ const AppContent = () => {
           isSearchError={isError}
           isSearchLoading={isLoading}
         />
+        {!searchTerm && <RecommendationsSection />}
       </div>
     </Layout.Content>
   );
