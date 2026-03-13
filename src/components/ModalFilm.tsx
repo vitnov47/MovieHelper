@@ -49,7 +49,13 @@ const ModalFilm = () => {
               Год выхода: <Text>{film.year}</Text>
             </Text>
             <Text type="secondary">
-              Оценка: <Text type="warning">{film.rating || "Нет оценок"}</Text>
+              Оценка:{" "}
+              <Text type="warning">
+                {film.rating ||
+                  film.ratingKinopoisk ||
+                  film.ratingImdb ||
+                  "Нет оценок"}
+              </Text>
             </Text>
           </Flex>
         </Flex>

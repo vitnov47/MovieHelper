@@ -7,6 +7,8 @@ export interface Movie {
   posterUrlPreview: string;
   posterUrl: string;
   rating: string;
+  ratingKinopoisk: string;
+  ratingImdb: string;
   description: string;
   genres: { genre: string }[];
   countries: { country: string }[];
