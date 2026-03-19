@@ -79,7 +79,7 @@ export const movieApi = createApi({
   }),
 });
 
-function calculateRating(rating: string): string {
+function calculateRating(rating: string | undefined): string {
   if (!rating || rating === "null") return "0";
   if (rating.includes("%")) {
     return rating.replace("%", "");
