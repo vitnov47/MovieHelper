@@ -36,7 +36,7 @@ const HeaderButtons = () => {
           Избранное
         </a>
       ),
-      icon: <BookOutlined />,
+      icon: <StarOutlined />,
     },
     // {
     //   key: "2",
@@ -49,7 +49,7 @@ const HeaderButtons = () => {
     //       Мои подборки
     //     </a>
     //   ),
-    //   icon: <StarOutlined />,
+    // icon: <BookOutlined />,
     // },
     {
       type: "divider",
