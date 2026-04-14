@@ -38,19 +38,19 @@ const HeaderButtons = () => {
       ),
       icon: <BookOutlined />,
     },
-    {
-      key: "2",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.antgroup.com"
-        >
-          Мои подборки
-        </a>
-      ),
-      icon: <StarOutlined />,
-    },
+    // {
+    //   key: "2",
+    //   label: (
+    //     <a
+    //       target="_blank"
+    //       rel="noopener noreferrer"
+    //       href="https://www.antgroup.com"
+    //     >
+    //       Мои подборки
+    //     </a>
+    //   ),
+    //   icon: <StarOutlined />,
+    // },
     {
       type: "divider",
     },
@@ -97,9 +97,9 @@ const HeaderButtons = () => {
               onClick={() => navigate("/favorites")}
             />
           </Tooltip>
-          <Tooltip title="Мои подборки" placement="bottom" color="#2d0f4f">
+          {/* <Tooltip title="Мои подборки" placement="bottom" color="#2d0f4f">
             <Button shape="circle" icon={<BookOutlined />} />
-          </Tooltip>
+          </Tooltip> */}
           <Tooltip title="Выйти" placement="bottom" color="red">
             <Button
               shape="circle"
