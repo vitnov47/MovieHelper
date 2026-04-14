@@ -11,103 +11,69 @@ const RecommendationsSection = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchAndCalculateRecommendations = async () => {
+    const fetchRecommendationsFromServer = async () => {
       if (!user) return;
 
       setIsLoading(true);
 
-      const { data, error } = await supabase.from("user_likes").select(`
-          user_id,
-          movie_id,
-          movies (*)
-        `);
-
-      if (error || !data) {
-        console.error("Ошибка при загрузке данных для рекомендаций:", error);
-        setIsLoading(false);
-        return;
-      }
-
-      const userLikesMap: Record<string, Set<number>> = {};
-      const moviesDataMap: Record<number, any> = {};
-
-      data.forEach((item: any) => {
-        if (!userLikesMap[item.user_id]) {
-          userLikesMap[item.user_id] = new Set();
-        }
-        userLikesMap[item.user_id].add(item.movie_id);
-        if (item.movies) {
-          moviesDataMap[item.movie_id] = item.movies;
-        }
-      });
-
-      const myLikes = userLikesMap[user.id] || new Set();
-
-      if (myLikes.size === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      const userSimilarities: { userId: string; score: number }[] = [];
-
-      for (const [otherUserId, otherLikes] of Object.entries(userLikesMap)) {
-        if (otherUserId === user.id) continue;
-        const intersection = new Set(
-          [...myLikes].filter((x) => otherLikes.has(x)),
+      try {
+        const { data: recommendations, error: rpcError } = await supabase.rpc(
+          "get_recommendations",
+          { target_user_id: user.id },
         );
-        const union = new Set([...myLikes, ...otherLikes]);
-        const jaccardScore = intersection.size / union.size;
-        if (jaccardScore > 0) {
-          userSimilarities.push({ userId: otherUserId, score: jaccardScore });
+
+        if (rpcError) throw rpcError;
+
+        if (!recommendations || recommendations.length === 0) {
+          setRecommendedMovies([]);
+          setIsLoading(false);
+          return;
         }
+
+        const movieIds = recommendations.map(
+          (r: any) => r.recommended_movie_id,
+        );
+
+        const { data: moviesData, error: moviesError } = await supabase
+          .from("movies")
+          .select("*")
+          .in("id", movieIds);
+
+        if (moviesError) throw moviesError;
+
+        const finalRecommendations = movieIds
+          .map((id: number) => {
+            const dbMovie = moviesData.find((m: any) => m.id === id);
+            if (!dbMovie) return null;
+
+            return {
+              kinopoiskId: dbMovie.id,
+              filmId: dbMovie.id,
+              nameRu: dbMovie.name_ru,
+              nameEn: dbMovie.name_en,
+              year: dbMovie.year,
+              posterUrlPreview: dbMovie.poster_url_preview,
+              posterUrl: dbMovie.poster_url,
+              rating: dbMovie.rating,
+              description: dbMovie.description,
+              genres: dbMovie.genres,
+              countries: dbMovie.countries,
+              type: dbMovie.type,
+            } as Movie;
+          })
+          .filter(Boolean) as Movie[];
+
+        setRecommendedMovies(finalRecommendations);
+      } catch (error) {
+        console.error("Ошибка при получении рекомендаций с сервера:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      const movieScores: Record<number, number> = {};
-
-      userSimilarities.forEach((similarUser) => {
-        const theirLikes = userLikesMap[similarUser.userId];
-
-        theirLikes.forEach((movieId) => {
-          if (!myLikes.has(movieId)) {
-            movieScores[movieId] =
-              (movieScores[movieId] || 0) + similarUser.score;
-          }
-        });
-      });
-
-      const sortedRecommendedMovieIds = Object.entries(movieScores)
-        .sort((a, b) => b[1] - a[1])
-        .map(([movieId]) => Number(movieId));
-
-      const finalRecommendations = sortedRecommendedMovieIds
-        .map((movieId) => {
-          const dbMovie = moviesDataMap[movieId];
-          if (!dbMovie) return null;
-          return {
-            kinopoiskId: dbMovie.id,
-            filmId: dbMovie.id,
-            nameRu: dbMovie.name_ru,
-            nameEn: dbMovie.name_en,
-            year: dbMovie.year,
-            posterUrlPreview: dbMovie.poster_url_preview,
-            posterUrl: dbMovie.poster_url,
-            rating: dbMovie.rating,
-            description: dbMovie.description,
-            genres: dbMovie.genres,
-            countries: dbMovie.countries,
-            type: dbMovie.type,
-          } as Movie;
-        })
-        .filter(Boolean) as Movie[];
-
-      setRecommendedMovies(finalRecommendations);
-      setIsLoading(false);
     };
 
-    fetchAndCalculateRecommendations();
+    fetchRecommendationsFromServer();
   }, [user]);
 
-  // Если юзер не залогинен, не показываем секцию
   if (!user) return null;
 
   return (
