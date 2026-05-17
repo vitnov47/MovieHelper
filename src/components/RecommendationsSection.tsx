@@ -9,53 +9,70 @@ const RecommendationsSection = () => {
   const { user, isDarkMode } = useMovieContext();
   const [recommendedMovies, setRecommendedMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const fetchRecommendationsFromServer = async () => {
-      if (!user?.id || isFetching || recommendedMovies.length > 0) return;
+      if (!user) return;
 
-      setIsFetching(true);
       setIsLoading(true);
 
       try {
-        const { data: recommendedData, error: rpcError } = await supabase.rpc(
+        const { data: recommendations, error: rpcError } = await supabase.rpc(
           "get_recommendations",
           { target_user_id: user.id },
         );
 
         if (rpcError) throw rpcError;
 
-        if (!recommendedData || recommendedData.length === 0) {
+        if (!recommendations || recommendations.length === 0) {
           setRecommendedMovies([]);
+          setIsLoading(false);
           return;
         }
 
-        const finalRecommendations = recommendedData.map((dbMovie: any) => ({
-          kinopoiskId: dbMovie.id,
-          filmId: dbMovie.id,
-          nameRu: dbMovie.name_ru,
-          nameEn: dbMovie.name_en,
-          year: dbMovie.year,
-          posterUrlPreview: dbMovie.poster_url_preview,
-          posterUrl: dbMovie.poster_url,
-          rating: dbMovie.rating,
-          description: dbMovie.description,
-          genres: dbMovie.genres,
-          countries: dbMovie.countries,
-          type: dbMovie.type,
-        })) as Movie[];
+        const movieIds = recommendations.map(
+          (r: any) => r.recommended_movie_id,
+        );
+
+        const { data: moviesData, error: moviesError } = await supabase
+          .from("movies")
+          .select("*")
+          .in("id", movieIds);
+
+        if (moviesError) throw moviesError;
+
+        const finalRecommendations = movieIds
+          .map((id: number) => {
+            const dbMovie = moviesData.find((m: any) => m.id === id);
+            if (!dbMovie) return null;
+
+            return {
+              kinopoiskId: dbMovie.id,
+              filmId: dbMovie.id,
+              nameRu: dbMovie.name_ru,
+              nameEn: dbMovie.name_en,
+              year: dbMovie.year,
+              posterUrlPreview: dbMovie.poster_url_preview,
+              posterUrl: dbMovie.poster_url,
+              rating: dbMovie.rating,
+              description: dbMovie.description,
+              genres: dbMovie.genres,
+              countries: dbMovie.countries,
+              type: dbMovie.type,
+            } as Movie;
+          })
+          .filter(Boolean) as Movie[];
 
         setRecommendedMovies(finalRecommendations);
       } catch (error) {
-        console.error("Ошибка при получении рекомендаций:", error);
+        console.error("Ошибка при получении рекомендаций с сервера:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchRecommendationsFromServer();
-  }, [user?.id]);
+  }, [user]);
 
   if (!user) return null;
 
