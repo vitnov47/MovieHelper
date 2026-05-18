@@ -38,22 +38,18 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    let subscription: any = null;
-    const init = async () => {
-      // Сначала получаем сессию
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      // Только ПОТОМ подписываемся на изменения
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null);
-      });
-      subscription = data.subscription;
-    };
-    init();
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 

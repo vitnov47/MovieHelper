@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ServerResponse, Movie } from "../types/movie";
+import { supabase } from "../supabaseClient";
 
 export const movieApi = createApi({
   reducerPath: "movieApi",
@@ -91,29 +92,17 @@ export const movieApi = createApi({
     }),
     getRecommendations: builder.query<Movie[], string>({
       async queryFn(userId) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
         try {
-          const response = await fetch(
-            `${supabaseUrl}/rest/v1/rpc/get_recommendations`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`,
-              },
-              body: JSON.stringify({ target_user_id: userId }),
-            }
-          );
-          
-          if (!response.ok) {
-             const errorData = await response.json();
-             return { error: { status: response.status, data: errorData } as any };
+          const { data, error } = await supabase.rpc("get_recommendations", {
+            target_user_id: userId,
+          });
+
+          if (error) {
+            return {
+              error: { status: error.code, data: error.message } as any,
+            };
           }
-          
-          const data = await response.json();
-          
+
           const finalRecommendations = (data || [])
             .map((dbMovie: any) => {
               return {
@@ -132,10 +121,12 @@ export const movieApi = createApi({
               } as Movie;
             })
             .filter(Boolean) as Movie[];
-            
+
           return { data: finalRecommendations };
         } catch (err: any) {
-          return { error: { status: 'FETCH_ERROR', error: err.message } as any };
+          return {
+            error: { status: "FETCH_ERROR", error: err.message } as any,
+          };
         }
       },
     }),
