@@ -29,18 +29,24 @@ export const movieApi = createApi({
     getTopMovies: builder.query<ServerResponse, void>({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         const pages = [1, 2, 3];
-        const results = await Promise.all(
-          pages.map((page) =>
-            fetchWithBQ(
-              `/v2.2/films/collections?type=TOP_POPULAR_MOVIES&page=${page}`,
-            ),
-          ),
-        );
+        const allFilms = [];
 
-        const error = results.find((r) => r.error);
-        if (error) return { error: error.error as any };
+        for (const page of pages) {
+          const result = await fetchWithBQ(
+            `/v2.2/films/collections?type=TOP_POPULAR_MOVIES&page=${page}`,
+          );
 
-        const allFilms = results.flatMap((r) => (r.data as any).items);
+          if (result.error) {
+            return { error: result.error as any };
+          }
+
+          allFilms.push(...(result.data as any).items);
+
+          if (page !== pages[pages.length - 1]) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+        }
+
         return {
           data: {
             films: allFilms,
@@ -51,21 +57,28 @@ export const movieApi = createApi({
         };
       },
     }),
+
     getTopSeries: builder.query<ServerResponse, void>({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         const pages = [1, 2, 3];
-        const results = await Promise.all(
-          pages.map((page) =>
-            fetchWithBQ(
-              `/v2.2/films/collections?type=POPULAR_SERIES&page=${page}`,
-            ),
-          ),
-        );
+        const allFilms = [];
 
-        const error = results.find((r) => r.error);
-        if (error) return { error: error.error as any };
+        for (const page of pages) {
+          const result = await fetchWithBQ(
+            `/v2.2/films/collections?type=POPULAR_SERIES&page=${page}`,
+          );
 
-        const allFilms = results.flatMap((r) => (r.data as any).items);
+          if (result.error) {
+            return { error: result.error as any };
+          }
+
+          allFilms.push(...(result.data as any).items);
+
+          if (page !== pages[pages.length - 1]) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+        }
+
         return {
           data: {
             films: allFilms,

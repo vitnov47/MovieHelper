@@ -16,6 +16,7 @@ const FilmCard = ({ film }: FilmCardProps) => {
           src={film.posterUrlPreview}
           alt={film.nameRu}
           className="poster-image"
+          loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== defaultPoster) target.src = defaultPoster;

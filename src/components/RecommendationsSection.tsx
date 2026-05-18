@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useMovieContext from "../context/movie-context";
 import { supabase } from "../supabaseClient";
 import type { Movie } from "../types/movie";
@@ -10,10 +10,13 @@ const RecommendationsSection = () => {
   const [recommendedMovies, setRecommendedMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const fetchedForUserId = useRef<string | null>(null);
+
   useEffect(() => {
     const fetchRecommendationsFromServer = async () => {
-      if (!user) return;
+      if (!user?.id || fetchedForUserId.current === user.id) return;
 
+      fetchedForUserId.current = user.id;
       setIsLoading(true);
 
       try {
@@ -26,7 +29,6 @@ const RecommendationsSection = () => {
 
         if (!recommendations || recommendations.length === 0) {
           setRecommendedMovies([]);
-          setIsLoading(false);
           return;
         }
 
@@ -43,7 +45,7 @@ const RecommendationsSection = () => {
 
         const finalRecommendations = movieIds
           .map((id: number) => {
-            const dbMovie = moviesData.find((m: any) => m.id === id);
+            const dbMovie = moviesData.find((m: any) => m.id == id);
             if (!dbMovie) return null;
 
             return {
@@ -62,17 +64,17 @@ const RecommendationsSection = () => {
             } as Movie;
           })
           .filter(Boolean) as Movie[];
-
         setRecommendedMovies(finalRecommendations);
       } catch (error) {
         console.error("Ошибка при получении рекомендаций с сервера:", error);
+        fetchedForUserId.current = null;
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchRecommendationsFromServer();
-  }, [user]);
+  }, [user?.id]);
 
   if (!user) return null;
 
