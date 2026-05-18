@@ -89,6 +89,56 @@ export const movieApi = createApi({
         };
       },
     }),
+    getRecommendations: builder.query<Movie[], string>({
+      async queryFn(userId) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        try {
+          const response = await fetch(
+            `${supabaseUrl}/rest/v1/rpc/get_recommendations`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+              },
+              body: JSON.stringify({ target_user_id: userId }),
+            }
+          );
+          
+          if (!response.ok) {
+             const errorData = await response.json();
+             return { error: { status: response.status, data: errorData } as any };
+          }
+          
+          const data = await response.json();
+          
+          const finalRecommendations = (data || [])
+            .map((dbMovie: any) => {
+              return {
+                kinopoiskId: dbMovie.kinopoiskid,
+                filmId: dbMovie.kinopoiskid,
+                nameRu: dbMovie.nameru,
+                nameEn: dbMovie.nameen,
+                year: dbMovie.year,
+                posterUrlPreview: dbMovie.posterurlpreview,
+                posterUrl: dbMovie.posterurl,
+                rating: dbMovie.rating,
+                description: dbMovie.description,
+                genres: dbMovie.genres,
+                countries: dbMovie.countries,
+                type: dbMovie.type,
+              } as Movie;
+            })
+            .filter(Boolean) as Movie[];
+            
+          return { data: finalRecommendations };
+        } catch (err: any) {
+          return { error: { status: 'FETCH_ERROR', error: err.message } as any };
+        }
+      },
+    }),
   }),
 });
 
@@ -111,4 +161,5 @@ export const {
   useSearchMoviesQuery,
   useGetTopMoviesQuery,
   useGetTopSeriesQuery,
+  useGetRecommendationsQuery,
 } = movieApi;

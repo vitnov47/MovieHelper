@@ -142,7 +142,7 @@ const FilmSection = ({ title, films, isLoading }: CarouselFilmsProps) => {
               transition={{ duration: 0.2 }}
             >
               <Carousel {...carouselSettings} style={{ marginInline: 15 }}>
-                {films?.map((f) => (
+                {films?.slice(0, 10).map((f) => (
                   <div key={f.filmId || f.kinopoiskId}>
                     <div style={{ padding: 8 }}>
                       <FilmCard film={f} />
