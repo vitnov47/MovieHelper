@@ -9,6 +9,7 @@ const ModalFilm = () => {
     closeModal,
     toggleFavorite,
     isFavorite,
+    isFavoriteLoading,
   } = useMovieContext();
 
   return (
@@ -21,6 +22,7 @@ const ModalFilm = () => {
           <Button
             key="back"
             type={isFavorite ? "default" : "primary"}
+            loading={isFavoriteLoading}
             onClick={() => {
               if (film) toggleFavorite(film);
             }}

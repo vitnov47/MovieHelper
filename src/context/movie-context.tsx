@@ -19,6 +19,7 @@ interface MovieContextType {
   closeModal: () => void;
   toggleFavorite: (film: Movie) => Promise<void>;
   isFavorite: boolean;
+  isFavoriteLoading: boolean;
   contextHolder: React.ReactElement;
 }
 
@@ -35,6 +36,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
   const [openModal, setOpenModal] = useState(false);
   const [pickedFilm, setPickedFilm] = useState<Movie | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -92,6 +94,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
   const closeModal = () => {
     setOpenModal(false);
     setPickedFilm(null);
+    setIsFavorite(false);
   };
 
   const toggleFavorite = async (film: Movie) => {
@@ -166,7 +169,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
       setIsFavorite(false);
       return;
     }
-
+    setIsFavoriteLoading(true);
     try {
       const { data, error } = await supabase
         .from("user_likes")
@@ -183,6 +186,8 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
       setIsFavorite(!!data);
     } catch (error) {
       console.error("Непредвиденная ошибка:", error);
+    } finally {
+      setIsFavoriteLoading(false);
     }
   };
 
@@ -203,6 +208,7 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
         closeModal,
         toggleFavorite,
         isFavorite,
+        isFavoriteLoading,
         contextHolder,
       }}
     >
