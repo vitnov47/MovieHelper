@@ -112,52 +112,23 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
     }
 
     try {
-      const { data: existingLike } = await supabase
-        .from("user_likes")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("movie_id", movieId)
-        .maybeSingle();
+      const res = await fetch("https://teardrop47.ru/api/favorites/toggle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          film: film,
+        }),
+      });
 
-      if (existingLike) {
-        const { error } = await supabase
-          .from("user_likes")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("movie_id", movieId);
+      if (!res.ok) throw new Error("Не удалось переключить статус");
 
-        if (error) throw error;
-        setIsFavorite(false);
-        messageApi.success("Фильм удален из избранного");
-      } else {
-        const { error: movieError } = await supabase.from("movies").upsert(
-          {
-            id: movieId,
-            name_ru: film.nameRu,
-            name_en: film.nameEn || null,
-            year: String(film.year),
-            poster_url_preview: film.posterUrlPreview,
-            poster_url: film.posterUrl,
-            rating: String(film.rating),
-            description: film.description,
-            genres: film.genres,
-            countries: film.countries,
-            type: film.type,
-          },
-          { ignoreDuplicates: true },
-        );
+      const data = await res.json();
 
-        if (movieError) throw movieError;
-
-        const { error: likeError } = await supabase.from("user_likes").insert({
-          user_id: user.id,
-          movie_id: movieId,
-        });
-
-        if (likeError) throw likeError;
-        setIsFavorite(true);
-        messageApi.success("Фильм добавлен в избранное");
-      }
+      setIsFavorite(data.isFavorite);
+      messageApi.success(data.message);
     } catch (error) {
       console.error("Ошибка при работе с избранным:", error);
       messageApi.error("Произошла ошибка при сохранении. Попробуйте еще раз.");
@@ -171,21 +142,17 @@ export function MovieContextProvider({ children }: MovieContextProviderProps) {
     }
     setIsFavoriteLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("user_likes")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("movie_id", filmId)
-        .maybeSingle();
+      const res = await fetch(
+        `https://teardrop47.ru/api/favorites/check?userId=${user.id}&movieId=${filmId}`,
+      );
 
-      if (error) {
-        console.error("Ошибка при проверке статуса избранного:", error);
-        return;
-      }
+      if (!res.ok) throw new Error("Ошибка проверки");
 
-      setIsFavorite(!!data);
+      const data = await res.json();
+      setIsFavorite(data.isFavorite);
     } catch (error) {
-      console.error("Непредвиденная ошибка:", error);
+      console.error("Ошибка при проверке статуса избранного:", error);
+      setIsFavorite(false);
     } finally {
       setIsFavoriteLoading(false);
     }

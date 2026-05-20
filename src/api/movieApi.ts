@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ServerResponse, Movie } from "../types/movie";
-import { supabase } from "../supabaseClient";
 
 export const movieApi = createApi({
   reducerPath: "movieApi",
@@ -27,6 +26,7 @@ export const movieApi = createApi({
         };
       },
     }),
+
     getTopMovies: builder.query<ServerResponse, void>({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         const pages = [1, 2, 3];
@@ -90,39 +90,20 @@ export const movieApi = createApi({
         };
       },
     }),
+
     getRecommendations: builder.query<Movie[], string>({
       async queryFn(userId) {
         try {
-          const { data, error } = await supabase.rpc("get_recommendations", {
-            target_user_id: userId,
-          });
+          const response = await fetch(
+            `https://teardrop47.ru/api/recommendations/${userId}`,
+          );
 
-          if (error) {
-            return {
-              error: { status: error.code, data: error.message } as any,
-            };
+          if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
           }
 
-          const finalRecommendations = (data || [])
-            .map((dbMovie: any) => {
-              return {
-                kinopoiskId: dbMovie.kinopoiskid,
-                filmId: dbMovie.kinopoiskid,
-                nameRu: dbMovie.nameru,
-                nameEn: dbMovie.nameen,
-                year: dbMovie.year,
-                posterUrlPreview: dbMovie.posterurlpreview,
-                posterUrl: dbMovie.posterurl,
-                rating: dbMovie.rating,
-                description: dbMovie.description,
-                genres: dbMovie.genres,
-                countries: dbMovie.countries,
-                type: dbMovie.type,
-              } as Movie;
-            })
-            .filter(Boolean) as Movie[];
-
-          return { data: finalRecommendations };
+          const recommendedMovies = await response.json();
+          return { data: recommendedMovies as Movie[] };
         } catch (err: any) {
           return {
             error: { status: "FETCH_ERROR", error: err.message } as any,

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Layout, Row, Col } from "antd";
 import useMovieContext from "../../context/movie-context";
-import { supabase } from "../../supabaseClient";
 import type { Movie } from "../../types/movie";
 import LoadingSection from "../LoadingSection";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,46 +36,20 @@ const FavoritesPage = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("user_likes")
-        .select(
-          `
-          movie_id,
-          movies (*) 
-        `,
-        )
-        .eq("user_id", user.id);
+      try {
+        const res = await fetch(
+          `https://teardrop47.ru/api/favorites/${user.id}`,
+        );
 
-      if (error) {
-        console.error("Ошибка загрузки избранного:", error);
-      } else if (data) {
-        const films = data
-          .map((item: any) => {
-            const dbMovie = item.movies;
-            if (!dbMovie) return null;
+        if (!res.ok) throw new Error("Не удалось загрузить избранное");
 
-            return {
-              kinopoiskId: dbMovie.id,
-              filmId: dbMovie.id,
-              nameRu: dbMovie.name_ru,
-              nameEn: dbMovie.name_en,
-              year: dbMovie.year,
-              posterUrlPreview: dbMovie.poster_url_preview,
-              posterUrl: dbMovie.poster_url,
-              rating:
-                dbMovie.rating === "undefined" ? "Нет оценок" : dbMovie.rating,
-              description: dbMovie.description,
-              genres: dbMovie.genres,
-              countries: dbMovie.countries,
-              type: dbMovie.type,
-            } as Movie;
-          })
-          .filter(Boolean);
-
+        const films = await res.json();
         setFavoriteFilms(films as Movie[]);
+      } catch (error) {
+        console.error("Ошибка загрузки избранного:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
 
     fetchFavorites();
